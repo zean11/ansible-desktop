@@ -6,6 +6,35 @@
   tasks:
   - name: install htop
     package: 
-      htop
+      name: 
+        - htop
+      state: present
+
+  - name: install tmux
+    package: 
+      name: 
+        - tmux
+      state: present
+
+  - name: add ansible user
+    user:
+      name: ansiblebot
+      system: yes
+
+  - name: set up sudo for ansible user
+    copy:
+      src: files/sudoer_ansiblebot
+      dest: /etc/sudoers.d/ansiblebot
+      owner: root
+      group: root
+      mode: 0440
+
+  - name: add ansible-pull cron job
+    cron:
+      name: ansible auto-provision
+      user: ansiblebot
+      minute: "*/10"
+      job: ansible-pull -o -U git@gitlab.com:martin.goerz/ansible-desktop.git
+
 
 
