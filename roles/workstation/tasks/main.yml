@@ -1,0 +1,246 @@
+---
+- name: Ensure reositories
+  dnf:
+    name:
+      - fedora-workstation-repositories
+    state: present
+  become: yes
+  tags: [ repos fedora ]
+
+# Make sure relevant system and desktop support packages are installed.
+- name: Ensure base system packages
+  package:
+    name:
+      - cmake
+      - cronie
+      - curl
+      - fzf
+      - git
+      - git-extras
+      - htop
+      - make
+      - openssh
+      - openssh-server
+      - papirus-icon-theme
+      - unzip
+      - wget
+      - whois
+      - zip
+      - zsh
+    state: present
+  tags: [ packages ]
+  become: yes
+
+- name: Ensure Gnome packages
+  package:
+    name:
+      - gnome-tweaks
+      - gnome-shell-extension-gsconnect
+      - gnome-shell-extension-dash-to-dock
+    state: latest
+  become: yes
+  tags: [ gnome ]
+
+    # sudo dnf install fedora-workstation-repositories
+    # sudo dnf config-manager --set-enabled google-chrome
+- name: Ensure desktop packages
+  package:
+    name:
+      - google-chrome-stable
+    state: present
+    enablerepo: 
+      - google-chrome
+  become: yes
+  tags: [ packages ]
+
+- name: Ensure software development packages
+  package:
+    name:
+      - neovim
+      - gcc-c++
+      - ripgrep
+      - fzf
+      - tmux
+      - nodejs
+      - python3
+      - python3-pip
+    state: present
+  become: yes
+  tags: [ packages ]
+
+- name: Ensure nvm for Nodejs
+  shell: >
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+  args:
+    creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+
+# Install python extra packages and ensure they are up to date.
+- name: Ensure pip3 packages
+  pip:
+    name: '{{item}}'
+    executable: pip3
+    state: latest
+  loop:
+    - pipenv
+  become: yes
+
+- name: Ensure Node global packages (npm)
+  npm:
+    name: '{{item}}'
+    global: yes
+    state: latest
+    production: yes
+  loop:
+    - '@bitwarden/cli'
+  changed_when: false # ignore
+  become: yes
+
+# # Make sure system services we explicitly need are running and enabled.
+# - name: Enable and start system services
+#   service:
+#     name: '{{item}}'
+#     state: started
+#     enabled: yes
+#   loop:
+#   become: yes
+
+#
+# Configs
+#
+- name: Ensure default directories in home
+  file:
+    path: '{{item}}'
+    state: directory
+    mode: '0700'
+    owner: '{{host_username}}'
+    group: '{{host_username}}'
+  loop:
+      - '/home/{{host_username}}/.ssh'
+      - '/home/{{host_username}}/.dotfiles'
+      - '/home/{{host_username}}/dev'
+  become: yes
+
+# Set up ansible-pull
+- name: add ansible user
+  become: true
+  user:
+    name: ansiblebot
+    system: yes
+
+- name: set up sudo for ansible user
+  become: true
+  copy:
+    src: files/sudoer_ansiblebot
+    dest: /etc/sudoers.d/ansiblebot
+    owner: root
+    group: root
+    mode: 0440
+
+- name: add ansible-pull cron job
+  become: true
+  cron:
+   name: ansible auto-provision
+   user: ansiblebot
+   minute: "*/10"
+   job: ansible-pull -o -U git@gitlab.com:martin.goerz/ansible-desktop.git
+
+# - name: Install modules from Ansible Galaxy
+#   command: ansible-galaxy install {{ item.item }}
+#   with_items:
+#     - "jan_matthis.git_dotfiles"
+
+# Dotfiles
+- include_role:
+    name: jan_matthis.git_dotfiles
+
+# Global gitignore 
+- name: Global gitignore 
+  git_config:
+    name: core.excludesfile
+    value: '$HOME/.config/.gitignore_global'
+    scope: global
+
+# Show Untracked Files no
+- name: Show Untracked Files no
+  git_config:
+    name: status.showUntrackedFiles
+    repo: '/home/{{host_username}}/.dotfiles'
+    value: "no"
+    scope: local
+
+# Ensure DCONF profile is present on the system. This deals with desktop customization and defaults.
+# - name: Configure DCONF
+#   file:
+#     path: /etc/dconf/profile
+#     state: directory
+#     mode: '0755'
+#     owner: root
+#     group: root
+#   become: yes
+# 
+# - name: Copy dconf user profile config
+#   copy:
+#     src: dconf_profile_user
+#     dest: /etc/dconf/profile/user
+#     mode: '0644'
+#     owner: root
+#     group: root
+#   become: yes
+# 
+# - name: Create /etc/dconf/db/local.d
+#   file:
+#     path: /etc/dconf/db/local.d
+#     state: directory
+#     mode: '0755'
+#     owner: root
+#     group: root
+#   become: yes
+# 
+# - name: Update dconf settings
+#   copy:
+#     src: dconf_settings.ini
+#     dest: /etc/dconf/db/local.d/00-global
+#     mode: '0644'
+#     owner: root
+#     group: root
+#   notify: [ Update dconf ]
+#   become: yes
+# END
+
+# zsh
+#
+# - name: Install oh-my-zsh for root
+#   script:
+#     cmd: 'scripts/oh-my-zsh-setup.sh --unattended --keep-zshrc'
+#     creates: '/root/.oh-my-zsh'
+#   changed_when: false # ignore
+#   become: yes
+# 
+# - name: Install oh-my-zsh for self
+#   script:
+#     cmd: 'scripts/oh-my-zsh-setup.sh --unattended --keep-zshrc'
+#     chdir: '/home/{{host_username}}'
+#     creates: '/home/{{host_username}}/.oh-my-zsh'
+#   changed_when: false # ignore
+
+# - name: Install pyenv for own user
+#   script:
+#     cmd: 'scripts/pyenv-setup.sh'
+#     chdir: '/home/{{host_username}}'
+#     creates: '/home/{{host_username}}/.pyenv'
+#   changed_when: false # ignore
+
+# - name: Ensure system files
+#   copy:
+#     src: '{{item.src}}'
+#     dest: '{{item.dest}}'
+#     mode: '0644'
+#     owner: root
+#     group: root
+#   loop:
+#     - { src: menu-icon.svg, dest: /etc/menu-icon.svg } # Used by Arc Menu GNOME extension.
+#     - { src: wallpaper.png, dest: /etc/wallpaper.png } # System default wallpaper
+#     - { src: issue, dest: /etc/issue } # System banner
+#     - { src: issue.net, dest: /etc/issue.net } # System banner - for network clients
+#     - { src: motd, dest: /etc/motd } # User motd
+#   become: yes

@@ -1,0 +1,6 @@
+---
+- src: zaiste.essentials
+- src: zaiste.nginx
+- src: williamyeh.oracle-java
+- src: zaiste.security
+

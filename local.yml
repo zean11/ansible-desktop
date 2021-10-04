@@ -1,84 +1,18 @@
 ---
 - hosts: localhost
   connection: local
-
-  tasks:
-  - name: install gnome-shell-extension-dash-to-dock
-    become: true
-    package: 
-      name: 
-        - gnome-shell-extension-dash-to-dock
-      state: present
-
-  - name: install rust
-    become: true
-    package: 
-      name: 
-        - rust
-      state: present
-
-  - name: install cargo
-    become: true
-    package: 
-      name: 
-        - cargo
-      state: present
-
-  - name: nvm
-    shell: >
-      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-    args:
-      creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
-
-  - name: install nodejs
-    become: true
-    package: 
-      name: 
-        - nodejs
-      state: present
-
-  - name: install htop
-    become: true
-    package: 
-      name: 
-        - htop
-      state: present
-
-  - name: install tmux
-    become: true
-    package: 
-      name: 
-        - tmux
-      state: present
-
-  - name: add ansible user
-    become: true
-    user:
-      name: ansiblebot
-      system: yes
-
-  - name: set up sudo for ansible user
-    become: true
-    copy:
-      src: files/sudoer_ansiblebot
-      dest: /etc/sudoers.d/ansiblebot
-      owner: root
-      group: root
-      mode: 0440
-
-#  - name: add ansible-pull cron job
-    become: true
-#    cron:
-#      name: ansible auto-provision
-#      user: ansiblebot
-#      minute: "*/10"
-#      job: ansible-pull -o -U git@gitlab.com:martin.goerz/ansible-desktop.git
-
-  - name: install gnome-shell-extension-gsconnect
-    become: true
-    package: 
-      name:
-        - gnome-shell-extension-gsconnect
-      state: present
-
+  vars:
+    git_dotfiles_repo: "https://gitlab.com/martin.goerz/dotfiles.git"
+    # Alias to manage dotfiles
+    git_dotfiles_alias: "config"
+    # Directory for dotfiles
+    git_dotfiles_dir: "{{ ansible_env.HOME }}"
+    # Directory for .git/ of dotfiles repository
+    git_dotfiles_dir_dot_git: "{{ ansible_env.HOME }}/.dotfiles/"
+    # Directory for backup files
+    git_dotfiles_dir_backup: "{{ ansible_env.HOME }}/.dotfiles_bak"
+    # File in which alias gets defined, empty string to not set it
+    git_dotfiles_alias_file: "{{ ansible_env.HOME }}/.bash_aliases"
+  roles:
+    - role: workstation
 
