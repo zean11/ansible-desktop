@@ -35,6 +35,7 @@
   package:
     name:
       - gnome-tweaks
+      - gnome-extensions-app
       - gnome-shell-extension-gsconnect
       - gnome-shell-extension-dash-to-dock
     state: latest
