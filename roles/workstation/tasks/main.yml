@@ -143,7 +143,7 @@
    name: ansible auto-provision
    user: ansiblebot
    minute: "*/10"
-   job: ansible-pull -o -U git@gitlab.com:martin.goerz/ansible-desktop.git
+   job: ansible-pull -o -U git@gitlab.com/martin.goerz/ansible-desktop.git
 
 # - name: Install modules from Ansible Galaxy
 #   command: ansible-galaxy install {{ item.item }}
@@ -187,7 +187,7 @@
 
 - name: Install NVChad
   git:
-    repo: "git clone https://github.com/NvChad/NvChad "
+    repo: "https://github.com/NvChad/NvChad"
     dest: "~/.config/nvim"
   when: not nvim_head.stat.exists
 

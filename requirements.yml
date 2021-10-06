@@ -1,6 +1,2 @@
 ---
-- src: zaiste.essentials
-- src: zaiste.nginx
-- src: williamyeh.oracle-java
-- src: zaiste.security
-
+- src: jan_matthis.git_dotfiles
