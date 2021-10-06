@@ -169,52 +169,86 @@
     value: "no"
     scope: local
 
-# Ensure DCONF profile is present on the system. This deals with desktop customization and defaults.
-# - name: Configure DCONF
-#   file:
-#     path: /etc/dconf/profile
-#     state: directory
-#     mode: '0755'
-#     owner: root
-#     group: root
-#   become: yes
-# 
-# - name: Ensure dconf settings in .config
-#   file:
-#     path: /home/{{host_username}}/.config/dconf/dconf_back
-#     state: file
-#     mode: '0755'
-#     owner: root
-#     group: root
-#   become: yes
+#
+# Install NVChad
+#
+- name: Ensure nvim is a git repo
+  stat:
+    path: /home/{{host_username}}/.config/nvim/.git/HEAD
+  register: nvim_head
 
-# - name: Copy dconf user profile config
-#   copy:
-#     src: dconf_profile_user
-#     dest: /etc/dconf/profile/user
-#     mode: '0644'
-#     owner: root
-#     group: root
-#   become: yes
-# 
-# - name: Create /etc/dconf/db/local.d
-#   file:
-#     path: /etc/dconf/db/local.d
-#     state: directory
-#     mode: '0755'
-#     owner: root
-#     group: root
-#   become: yes
-# 
-# - name: Update dconf settings
-#   copy:
-#     src: dconf_settings.ini
-#     dest: /etc/dconf/db/local.d/00-global
-#     mode: '0644'
-#     owner: root
-#     group: root
-#   notify: [ Update dconf ]
-#   become: yes
+- name: Remove nvim folder if not a repo
+  file:
+    path: /home/{{host_username}}/.config/nvim
+    owner: '{{host_username}}'
+    group: '{{host_username}}'
+    state: absent
+  when: not nvim_head.stat.exists
+
+- name: Install NVChad
+  git:
+    repo: "git clone https://github.com/NvChad/NvChad "
+    dest: "~/.config/nvim"
+  when: not nvim_head.stat.exists
+
+- name: Find all files in nvchad
+  find:
+    paths: /home/{{host_username}}/.config/nvchad/
+  register: find
+  when: not nvim_head.stat.exists
+
+- name: Create symlinks to nvchad custom folder
+  file:
+    src: "{{ item.path }}"
+    path: "/home/{{host_username}}/.config/nvim/lua/custom/{{ item.path | basename }}"
+    state: link
+  with_items: "{{ find.files }}"
+  when: not nvim_head.stat.exists
+
+
+# Ensure DCONF profile is present on the system. This deals with desktop customization and defaults.
+- name: Configure DCONF
+  file:
+    path: /etc/dconf/profile
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  become: yes
+
+- name: Ensure dconf settings in .config
+  file:
+    path: /home/{{host_username}}/.config/dconf_back
+    state: file
+  become: yes
+
+- name: Copy dconf user profile config
+  copy:
+    src: dconf_profile_user
+    dest: /etc/dconf/profile/user
+    mode: '0644'
+    owner: root
+    group: root
+  become: yes
+
+- name: Create /etc/dconf/db/local.d
+  file:
+    path: /etc/dconf/db/local.d
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  become: yes
+
+- name: Update dconf settings
+  copy:
+    src: /home/{{host_username}}/.config/dconf_back
+    dest: /etc/dconf/db/local.d/00-global
+    mode: '0644'
+    owner: root
+    group: root
+  notify: [ Update dconf ]
+  become: yes
 # END
 
 # zsh
