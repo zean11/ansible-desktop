@@ -152,7 +152,7 @@
    name: ansible auto-provision
    user: ansiblebot
    minute: "*/10"
-   job: "ansible-pull -o -U https://gitlab.com/martin.goerz/ansible-desktop.git"
+   job: "/usr/bin/ansible-pull -o -U https://gitlab.com/martin.goerz/ansible-desktop.git > /var/log/ansible_bot.log"
 
 # - name: Install modules from Ansible Galaxy
 #   command: ansible-galaxy install {{ item.item }}
@@ -303,3 +303,9 @@
 #     - { src: issue.net, dest: /etc/issue.net } # System banner - for network clients
 #     - { src: motd, dest: /etc/motd } # User motd
 #   become: yes
+# - name: Create a 2048-bit SSH key for user jsmith in ~jsmith/.ssh/id_rsa
+  # ansible.builtin.user:
+  #   name: jsmith
+  #   generate_ssh_key: yes
+  #   ssh_key_bits: 2048
+  #   ssh_key_file: .ssh/id_rsa
