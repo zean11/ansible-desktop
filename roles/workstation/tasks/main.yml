@@ -25,6 +25,7 @@
       - unzip
       - wget
       - whois
+      - vifm
       - zip
       - zsh
     state: present
