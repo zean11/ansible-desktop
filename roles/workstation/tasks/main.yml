@@ -21,6 +21,7 @@
       - make
       - openssh
       - openssh-server
+      - starship
       - unzip
       - wget
       - whois
@@ -40,10 +41,16 @@
       - papirus-icon-theme
     state: latest
   become: yes
-  tags: [ gnome ]
+  tags: [ gnome ] 
+ 
+- name: Ensure Gnome packages removed
+  package:
+    name:
+      - gnome-shell-extension-background-logo
+    state: absent
+  become: yes
+  tags: [ gnome ] 
 
-    # sudo dnf install fedora-workstation-repositories
-    # sudo dnf config-manager --set-enabled google-chrome
 - name: Ensure desktop packages
   package:
     name:
@@ -97,13 +104,14 @@
   become: yes
 
 # # Make sure system services we explicitly need are running and enabled.
-# - name: Enable and start system services
-#   service:
-#     name: '{{item}}'
-#     state: started
-#     enabled: yes
-#   loop:
-#   become: yes
+- name: Enable and start system services
+  service:
+    name: '{{item}}'
+    state: started
+    enabled: yes
+  loop:
+    - cronie
+  become: yes
 
 #
 # Configs
@@ -143,7 +151,7 @@
    name: ansible auto-provision
    user: ansiblebot
    minute: "*/10"
-   job: ansible-pull -o -U git@gitlab.com/martin.goerz/ansible-desktop.git
+   job: "ansible-pull -o -U git@gitlab.com:martin.goerz/ansible-desktop.git"
 
 # - name: Install modules from Ansible Galaxy
 #   command: ansible-galaxy install {{ item.item }}
