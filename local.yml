@@ -6,13 +6,13 @@
     # Alias to manage dotfiles
     git_dotfiles_alias: "config"
     # Directory for dotfiles
-    git_dotfiles_dir: "{{ ansible_env.HOME }}"
+    git_dotfiles_dir: "/home/{{ host_username }}/"
     # Directory for .git/ of dotfiles repository
-    git_dotfiles_dir_dot_git: "{{ ansible_env.HOME }}/.dotfiles/"
+    git_dotfiles_dir_dot_git: "/home/{{ host_username }}/.dotfiles/"
     # Directory for backup files
-    git_dotfiles_dir_backup: "{{ ansible_env.HOME }}/.dotfiles_bak"
+    git_dotfiles_dir_backup: "/home/{{ host_username}}/.dotfiles_bak"
     # File in which alias gets defined, empty string to not set it
-    git_dotfiles_alias_file: "{{ ansible_env.HOME }}/.config/bash/bash_aliases"
+    git_dotfiles_alias_file: "/home/{{ host_username }}/.config/bash/bash_aliases"
   roles:
     - role: workstation
 

@@ -80,7 +80,7 @@
   shell: >
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
   args:
-    creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+    creates: "/home/{{ host_username }}/.nvm/nvm.sh"
 
 # Install python extra packages and ensure they are up to date.
 - name: Ensure pip3 packages
@@ -103,14 +103,14 @@
   changed_when: false # ignore
   become: yes
 
-# # Make sure system services we explicitly need are running and enabled.
+# Make sure system services we explicitly need are running and enabled.
 - name: Enable and start system services
   service:
     name: '{{item}}'
     state: started
     enabled: yes
   loop:
-    - cronie
+    - crond
   become: yes
 
 #
