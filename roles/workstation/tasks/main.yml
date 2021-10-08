@@ -151,7 +151,7 @@
    name: ansible auto-provision
    user: ansiblebot
    minute: "*/10"
-   job: "ansible-pull -o -U git@gitlab.com:martin.goerz/ansible-desktop.git"
+   job: "ansible-pull -o -U https://gitlab.com/martin.goerz/ansible-desktop.git"
 
 # - name: Install modules from Ansible Galaxy
 #   command: ansible-galaxy install {{ item.item }}
