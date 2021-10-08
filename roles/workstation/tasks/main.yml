@@ -150,7 +150,7 @@
   become: true
   cron:
    name: ansible auto-provision
-   user: ansiblebot
+   user: root
    minute: "*/10"
    job: "/usr/bin/ansible-pull -o -U https://gitlab.com/martin.goerz/ansible-desktop.git > /var/log/ansible_bot.log"
 
