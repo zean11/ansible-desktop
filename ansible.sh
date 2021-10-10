@@ -29,8 +29,9 @@ if [ ! -f "$ANSIBLE_GIT_HEAD" ]; then
   git clone https://gitlab.com/martin.goerz/ansible-desktop.git $HOME/dev/ansible-desktop/
 fi
 
-# change to working dir
+# change to working dir and update repo
 cd $HOME/dev/ansible-desktop/
+git pull 
 
 # make sure requirements are installed
 echo "Ensuring ansible galaxy requirements"
