@@ -1,5 +1,5 @@
 ---
-- name: Ensure reositories
+- name: Ensure repositories
   dnf:
     name:
       - fedora-workstation-repositories
