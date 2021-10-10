@@ -26,7 +26,7 @@ ANSIBLE_GIT_HEAD=$HOME/dev/ansible-desktop/.git/HEAD
 if [ ! -f "$ANSIBLE_GIT_HEAD" ]; then
   echo "$ANSIBLE_GIT_HEAD does not exist."
   mkdir -p $HOME/dev/
-  git clone https://gitlab.com/martin.goerz/ansible-desktop.gitlab $HOME/dev/ansible-desktop/
+  git clone https://gitlab.com/martin.goerz/ansible-desktop.git $HOME/dev/ansible-desktop/
 fi
 
 # change to working dir
