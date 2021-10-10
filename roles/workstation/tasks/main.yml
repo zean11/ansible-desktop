@@ -163,6 +163,24 @@
 - include_role:
     name: jan_matthis.git_dotfiles
 
+- name: change owner of config bash folder
+  file:
+    path: /home/{{host_username}}/.config/bash
+    owner: {{host_username}}
+    group: {{host_username}}
+    state: directory
+    mode: '0755'
+    recurse: yes
+
+- name: restore staged repository
+  command:
+    cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore --staged .'
+
+- name: restore repository
+  command:
+    cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore .'
+
+
 # Global gitignore 
 - name: Global gitignore 
   git_config:
