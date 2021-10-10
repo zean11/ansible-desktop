@@ -16,17 +16,26 @@ done
 
 package="ansible git"
 
+echo "Ensuring that git and ansible is installed"
 sudo ${package_manager} ${package}
 
 # ensure git repo
-mkdir -p $HOME/dev/
-git clone https://gitlab.com/martin.goerz/ansible-desktop.gitlab $HOME/dev/ansible-desktop/
+echo "Ensuring ansible-desktop repository"
+
+ANSIBLE_GIT_HEAD=$HOME/dev/ansible-desktop/.git/HEAD
+if [ ! -f "$ANSIBLE_GIT_HEAD" ]; then
+  echo "$ANSIBLE_GIT_HEAD does not exist."
+  mkdir -p $HOME/dev/
+  git clone https://gitlab.com/martin.goerz/ansible-desktop.gitlab $HOME/dev/ansible-desktop/
+fi
 
 # change to working dir
 cd $HOME/dev/ansible-desktop/
 
 # make sure requirements are installed
+echo "Ensuring ansible galaxy requirements"
 sudo ansible-galaxy install -r requirements.yml
 
 # run ansible
+echo "Runninng playbook"
 sudo ansible-playbook local.yml 
