@@ -1,4 +1,9 @@
 ---
+- name: Check if first time setup
+  stat:
+    path: /home/{{host_username}}/.dotfiles
+  register: dotfiles_folder
+
 - name: Ensure repositories
   dnf:
     name:
@@ -131,13 +136,13 @@
   become: yes
 
 # Set up ansible-pull
-- name: add ansible user
+- name: Add ansible user
   become: true
   user:
     name: ansiblebot
     system: yes
 
-- name: set up sudo for ansible user
+- name: Set up sudo for ansible user
   become: true
   copy:
     src: files/sudoer_ansiblebot
@@ -146,7 +151,7 @@
     group: root
     mode: 0440
 
-- name: add ansible-pull cron job
+- name: Add ansible-pull cron job
   become: true
   cron:
    name: ansible auto-provision
@@ -154,31 +159,30 @@
    minute: "*/10"
    job: "/usr/bin/ansible-pull -o -U https://gitlab.com/martin.goerz/ansible-desktop.git > /var/log/ansible_bot.log"
 
-# - name: Install modules from Ansible Galaxy
-#   command: ansible-galaxy install {{ item.item }}
-#   with_items:
-#     - "jan_matthis.git_dotfiles"
-
 # Dotfiles
 - include_role:
     name: jan_matthis.git_dotfiles
 
-- name: change owner of config bash folder
+- name: Change owner of config bash folder
   file:
     path: /home/{{host_username}}/.config/bash
-    owner: {{host_username}}
-    group: {{host_username}}
+    owner: "{{host_username}}"
+    group: "{{host_username}}"
     state: directory
     mode: '0755'
     recurse: yes
 
-- name: restore staged repository
-  command:
-    cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore --staged .'
 
-- name: restore repository
-  command:
-    cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore .'
+- name: Restore all files on first time setup
+  when: not dotfiles_folder.stat.exists
+  block:
+    - name: Unstage all missing files in dotfile repository
+      command:
+        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore --staged .'
+
+    - name: Restore missing files from dotifle repository
+      command:
+        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore .'
 
 
 # Global gitignore 
