@@ -126,7 +126,7 @@
   file:
     path: '{{item}}'
     state: directory
-    mode: '0700'
+    mode: '0774'
     owner: '{{host_username}}'
     group: '{{host_username}}'
   loop:
@@ -190,7 +190,7 @@
 
     - name: Restore missing files from dotifle repository
       command:
-        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore /home/{{host_username}}'
+        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore /home/{{host_username}}/'
 
 
 # Global gitignore 
