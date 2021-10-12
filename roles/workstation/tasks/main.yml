@@ -190,7 +190,7 @@
 
     - name: Restore missing files from dotifle repository
       command:
-        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore .'
+        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore /home/{{host_username}}'
 
 
 # Global gitignore 
