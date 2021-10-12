@@ -24,16 +24,16 @@ sudo ${package_manager} ${package}
 # ensure git repo
 echo "Ensuring ansible-desktop repository"
 
-ANSIBLE_GIT_HEAD=$HOME/dev/ansible-desktop/.git/HEAD
-if [ ! -f "$ANSIBLE_GIT_HEAD" ]; then
-  echo "$ANSIBLE_GIT_HEAD does not exist."
-  mkdir -p $HOME/dev/
-  git clone git@gitlab.com:martin.goerz/ansible-desktop.git $HOME/dev/ansible-desktop/
+ANSIBLE=$HOME/dev/ansible-desktop/
+if [[ -d "$ANSIBLE" ]]; then
+  echo "$ANSIBLE does not exist."
+  rm -rf $HOME/dev/ansible-desktop/
 fi
 
+mkdir -p $HOME/dev/
+git clone git@gitlab.com:martin.goerz/ansible-desktop.git $HOME/dev/ansible-desktop/
 # change to working dir and update repo
 cd $HOME/dev/ansible-desktop/
-git pull 
 
 # make sure requirements are installed
 echo "Ensuring ansible galaxy requirements"
