@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo echo ""
+
 # find appropriate package manager
 declare -A osInfo;
 osInfo[/etc/debian_version]="apt-get install -y"

@@ -169,7 +169,15 @@
     owner: "{{host_username}}"
     group: "{{host_username}}"
     state: directory
-    mode: '0755'
+    mode: '0644'
+    recurse: yes
+
+- name: Change owner of doftiles folder
+  file:
+    path: /home/{{host_username}}/.dotfiles
+    owner: "{{host_username}}"
+    group: "{{host_username}}"
+    state: directory
     recurse: yes
 
 
@@ -178,7 +186,7 @@
   block:
     - name: Unstage all missing files in dotfile repository
       command:
-        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore --staged .'
+        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ reset'
 
     - name: Restore missing files from dotifle repository
       command:
