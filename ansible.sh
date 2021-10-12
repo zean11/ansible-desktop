@@ -31,7 +31,7 @@ if [[ -d "$ANSIBLE" ]]; then
 fi
 
 mkdir -p $HOME/dev/
-git clone git@gitlab.com:martin.goerz/ansible-desktop.git $HOME/dev/ansible-desktop/
+git clone https://gitlab.com/martin.goerz/ansible-desktop.git $HOME/dev/ansible-desktop/
 # change to working dir and update repo
 cd $HOME/dev/ansible-desktop/
 

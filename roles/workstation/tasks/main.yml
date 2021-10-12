@@ -192,6 +192,10 @@
       command:
         cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore /home/{{host_username}}/'
 
+    - name: change upstream 
+      command:
+        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ remote set-url origin git@gitlab.com:martin.goerz/dotfiles.git'
+
 
 # Global gitignore 
 - name: Global gitignore 

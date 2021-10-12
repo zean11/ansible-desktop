@@ -2,7 +2,7 @@
 - hosts: localhost
   connection: local
   vars:
-    git_dotfiles_repo: "git@gitlab.com:martin.goerz/dotfiles.git"
+    git_dotfiles_repo: "https://gitlab.com/martin.goerz/dotfiles.git"
     # Alias to manage dotfiles
     git_dotfiles_alias: "config"
     # Directory for dotfiles
