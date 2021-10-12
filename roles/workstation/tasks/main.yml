@@ -227,13 +227,13 @@
 - name: Install NVChad
   git:
     repo: "https://github.com/NvChad/NvChad"
-    dest: "~/.config/nvim"
+    dest: "/home/{{host_username}}/.config/nvim"
   when: not nvim_head.stat.exists
 
 - name: Find all files in nvchad
   find:
     paths: /home/{{host_username}}/.config/nvchad/
-  register: find
+  register: nvchad
   when: not nvim_head.stat.exists
 
 - name: Create symlinks to nvchad custom folder
@@ -242,7 +242,7 @@
     path: "/home/{{host_username}}/.config/nvim/lua/custom/{{ item.path | basename }}"
     state: link
   with_items: "{{ find.files }}"
-  when: not nvim_head.stat.exists
+  when: not nvchad.stat.exists
 
 
 # Ensure DCONF profile is present on the system. This deals with desktop customization and defaults.
