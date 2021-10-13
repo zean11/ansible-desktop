@@ -1,8 +1,8 @@
 #!/bin/bash
 
-sudo echo ""
+sudo echo "Ensuring privileges"
 
-# find appropriate package manager
+echo "Determining package manager"
 declare -A osInfo;
 osInfo[/etc/debian_version]="apt-get install -y"
 osInfo[/etc/alpine-release]="apk --update add"
@@ -16,29 +16,14 @@ do
     fi
 done
 
-package="ansible git"
-
 echo "Ensuring that git and ansible is installed"
+package="ansible git"
 sudo ${package_manager} ${package}
 
-# ensure git repo
-echo "Ensuring ansible-desktop repository"
-
-ANSIBLE=$HOME/dev/ansible-desktop/
-if [[ -d "$ANSIBLE" ]]; then
-  echo "$ANSIBLE does not exist."
-  rm -rf $HOME/dev/ansible-desktop/
-fi
-
-mkdir -p $HOME/dev/
-git clone https://gitlab.com/martin.goerz/ansible-desktop.git $HOME/dev/ansible-desktop/
-# change to working dir and update repo
-cd $HOME/dev/ansible-desktop/
-
-# make sure requirements are installed
 echo "Ensuring ansible galaxy requirements"
+curl "https://gitlab.com/api/v4/projects/martin.goerz%2Fansible-desktop/repository/files/requirements.yml/raw?ref=main" > requirements.yml
 sudo ansible-galaxy install -r requirements.yml
+rm requirements.yml
 
-# run ansible
-echo "Runninng playbook"
-sudo ansible-playbook local.yml 
+echo "Runninng ansible-pull"
+/usr/bin/ansible-pull -o -U --track-subs https://gitlab.com/martin.goerz/ansible-desktop.git 
