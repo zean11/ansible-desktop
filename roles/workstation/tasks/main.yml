@@ -159,7 +159,7 @@
    name: ansible auto-provision
    user: root
    minute: "*/10"
-   job: "/usr/bin/ansible-pull -o -U --track-subs https://gitlab.com/martin.goerz/ansible-desktop.git > /var/log/ansible_bot.log"
+   job: "/usr/bin/ansible-pull -o --track-subs -U https://gitlab.com/martin.goerz/ansible-desktop.git > /var/log/ansible_bot.log"
 
 # Dotfiles
 - include_role:
