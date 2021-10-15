@@ -19,6 +19,7 @@
       - cmake
       - cronie
       - curl
+      - fd
       - fzf
       - git
       - git-extras
@@ -28,10 +29,11 @@
       - openssh-server
       - starship
       - unzip
+      - vifm
       - wget
       - whois
-      - vifm
       - zip
+      - zoxide
       - zsh
     state: present
   tags: [ packages ]
@@ -194,7 +196,7 @@
 
     - name: change upstream 
       command:
-        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ remote set-url origin git@gitlab.com:martin.goerz/dotfiles.git'
+        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ remote set-url --push origin git@gitlab.com:martin.goerz/dotfiles.git'
 
 
 # Global gitignore 
