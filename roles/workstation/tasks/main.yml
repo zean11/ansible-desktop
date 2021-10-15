@@ -19,7 +19,7 @@
       - cmake
       - cronie
       - curl
-      - fd-find
+      - 'fd-find'
       - fzf
       - git
       - git-extras
