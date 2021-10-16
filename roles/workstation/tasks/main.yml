@@ -19,7 +19,6 @@
       - cmake
       - cronie
       - curl
-      - 'fd-find'
       - fzf
       - git
       - git-extras
@@ -55,6 +54,7 @@
   package:
     name:
       - gnome-shell-extension-background-logo
+      - 'fd-find'
     state: absent
   become: yes
   tags: [ gnome ] 
@@ -247,7 +247,9 @@
     src: "{{ item.path }}"
     path: "/home/{{host_username}}/.config/nvim/lua/custom/{{ item.path | basename }}"
     state: link
-  with_items: "{{ find.files }}"
+  with_items: 
+    - chadrc.lua
+    - init.lua
   when: not nvchad.stat.exists
 
 
