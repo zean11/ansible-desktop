@@ -19,6 +19,7 @@
       - cmake
       - cronie
       - curl
+      - 'fd-find'
       - fzf
       - git
       - git-extras
@@ -54,7 +55,6 @@
   package:
     name:
       - gnome-shell-extension-background-logo
-      - 'fd-find'
     state: absent
   become: yes
   tags: [ gnome ] 
