@@ -26,4 +26,4 @@ sudo ansible-galaxy install -r requirements.yml
 rm requirements.yml
 
 echo "Runninng ansible-pull"
-sudo /usr/bin/ansible-pull -o --track-subs -U https://gitlab.com/martin.goerz/ansible-desktop.git 
+sudo /usr/bin/ansible-pull --track-subs -U https://gitlab.com/martin.goerz/ansible-desktop.git 
