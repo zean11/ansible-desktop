@@ -240,7 +240,6 @@
   find:
     paths: /home/{{host_username}}/.config/nvchad/
   register: nvchad
-  when: not nvim_head.stat.exists
 
 - name: Create symlinks to nvchad custom folder
   file:
