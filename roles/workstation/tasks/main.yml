@@ -217,40 +217,40 @@
 #
 # Install NVChad
 #
-- name: Ensure nvim is a git repo
-  stat:
-    path: /home/{{host_username}}/.config/nvim/.git/HEAD
-  register: nvim_head
-
-- name: Remove nvim folder if not a repo
-  file:
-    path: /home/{{host_username}}/.config/nvim
-    owner: '{{host_username}}'
-    group: '{{host_username}}'
-    state: absent
-  when: not nvim_head.stat.exists
-
-- name: Install NVChad
-  git:
-    repo: "https://github.com/NvChad/NvChad"
-    dest: "/home/{{host_username}}/.config/nvim"
-  when: not nvim_head.stat.exists
-
-- name: Find all files in nvchad
-  find:
-    paths: /home/{{host_username}}/.config/nvchad/
-  register: nvchad
-
-- name: Create symlinks to nvchad custom folder
-  file:
-    src: "{{ item.path }}"
-    path: "/home/{{host_username}}/.config/nvim/lua/custom/{{ item.path | basename }}"
-    state: link
-  with_items: 
-    - chadrc.lua
-    - init.lua
-  when: not nvchad.stat.exists
-
+#- name: Ensure nvim is a git repo
+#  stat:
+#    path: /home/{{host_username}}/.config/nvim/.git/HEAD
+#  register: nvim_head
+#
+#- name: Remove nvim folder if not a repo
+#  file:
+#    path: /home/{{host_username}}/.config/nvim
+#    owner: '{{host_username}}'
+#    group: '{{host_username}}'
+#    state: absent
+#  when: not nvim_head.stat.exists
+#
+#- name: Install NVChad
+#  git:
+#    repo: "https://github.com/NvChad/NvChad"
+#    dest: "/home/{{host_username}}/.config/nvim"
+#  when: not nvim_head.stat.exists
+#
+#- name: Find all files in nvchad
+#  find:
+#    paths: /home/{{host_username}}/.config/nvchad/
+#  register: nvchad
+#
+#- name: Create symlinks to nvchad custom folder
+#  file:
+#    src: "{{ item.path }}"
+#    path: "/home/{{host_username}}/.config/nvim/lua/custom/{{ item.path | basename }}"
+#    state: link
+#  with_items: 
+#    - chadrc.lua
+#    - init.lua
+#  when: not nvchad.stat.exists
+#
 
 # Ensure DCONF profile is present on the system. This deals with desktop customization and defaults.
 - name: Configure DCONF
