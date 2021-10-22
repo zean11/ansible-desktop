@@ -29,7 +29,6 @@
       - openssh-server
       - starship
       - unzip
-      - vifm
       - wget
       - whois
       - zip
@@ -55,6 +54,7 @@
   package:
     name:
       - gnome-shell-extension-background-logo
+      - vifm
     state: absent
   become: yes
   tags: [ gnome ] 
