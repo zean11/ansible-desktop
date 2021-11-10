@@ -217,7 +217,7 @@
       command:
         cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ remote set-url --push origin git@gitlab.com:martin.goerz/dotfiles.git'
 
-- name: Reset owner of directories
+- name: Ensure owner permissions agian after git reset
   file:
     path: '{{item}}'
     owner: "{{host_username}}"
@@ -226,11 +226,9 @@
     mode: '0755'
     recurse: yes
   loop:
-    # - '/home/{{host_username}}/'
     - '/home/{{host_username}}/.config'
     - '/home/{{host_username}}/.dotfiles'
     - '/home/{{host_username}}/.local/share/fonts'
-    - '/home/{{host_username}}/.bashrc'
   become: yes
 
 - name: Reset owner of files
