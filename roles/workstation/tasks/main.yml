@@ -29,6 +29,7 @@
       - openssh
       - openssh-server
       - starship
+      - snapd
       - unzip
       - wget
       - whois
@@ -89,6 +90,15 @@
   shell: >
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
   become: yes
+
+- name: Ensure snap packages
+  community.general.snap:
+    name:
+      - code
+    state: present
+    classic: yes
+  become: yes
+  tags: [ packages ]
 
 - name: Ensure nvm for Nodejs
   shell: >
