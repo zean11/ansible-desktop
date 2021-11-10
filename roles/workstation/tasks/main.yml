@@ -16,10 +16,11 @@
 - name: Ensure base system packages
   package:
     name:
+      - 'fd-find'
       - cmake
       - cronie
       - curl
-      - 'fd-find'
+      - flatpak
       - fzf
       - git
       - git-extras
@@ -83,6 +84,11 @@
     state: present
   become: yes
   tags: [ packages ]
+
+- name: Ensure flathub repo
+  shell: >
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  become: yes
 
 - name: Ensure nvm for Nodejs
   shell: >
@@ -165,22 +171,21 @@
 - include_role:
     name: jan_matthis.git_dotfiles
   
-- name: Change owner of config bash folder
+- name: Reset owner of directories
   file:
-    path: /home/{{host_username}}/.config/bash
+    path: '{{item}}'
     owner: "{{host_username}}"
     group: "{{host_username}}"
     state: directory
-    mode: '0644'
+    mode: '0755'
     recurse: yes
-
-- name: Change owner of doftiles folder
-  file:
-    path: /home/{{host_username}}/.dotfiles
-    owner: "{{host_username}}"
-    group: "{{host_username}}"
-    state: directory
-    recurse: yes
+  loop:
+    - '/home/{{host_username}}/'
+#    - '/home/{{host_username}}/.config'
+#    - '/home/{{host_username}}/.dotfiles'
+#    - '/home/{{host_username}}/.local/share/fonts'
+#    - '/home/{{host_username}}/.bashrc'
+  become: yes
 
 
 - name: Restore all files on first time setup
@@ -213,6 +218,18 @@
     repo: '/home/{{host_username}}/.dotfiles'
     value: "no"
     scope: local
+
+- name: Remove bash clutter
+  file:
+    path: {{item}}
+    owner: '{{host_username}}'
+    group: '{{host_username}}'
+    state: absent
+  loop:
+    - '/home/{{host_username}}/.bash_profile'
+    - '/home/{{host_username}}/.bash_history'
+    - '/home/{{host_username}}/.bash_logout'
+  become: yes
 
 #
 # Install NVChad
