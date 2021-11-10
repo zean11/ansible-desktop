@@ -231,7 +231,7 @@
 
 - name: Remove bash clutter
   file:
-    path: {{item}}
+    path: '{{item}}'
     owner: '{{host_username}}'
     group: '{{host_username}}'
     state: absent
