@@ -21,10 +21,10 @@ package="ansible git"
 sudo ${package_manager} ${package}
 
 echo "Ensuring ansible galaxy requirements"
-curl "https://gitlab.com/api/v4/projects/martin.goerz%2Fansible-desktop/repository/files/requirements.yml/raw?ref=main" > requirements.yml
-sudo ansible-galaxy role install -r requirements.yml
-sudo ansible-galaxy collection install -r requirements.yml
-rm requirements.yml
+curl "https://gitlab.com/api/v4/projects/martin.goerz%2Fansible-desktop/repository/files/requirements.yml/raw?ref=main" > requirements.yml.tmp
+sudo ansible-galaxy role install -r requirements.yml.tmp
+sudo ansible-galaxy collection install -r requirements.yml.tmp
+rm requirements.yml.tmp
 
 echo "Runninng ansible-pull"
 sudo /usr/bin/ansible-pull --track-subs -U https://gitlab.com/martin.goerz/ansible-desktop.git 
