@@ -1,4 +1,5 @@
 ---
+roles:
 - src: jan_matthis.git_dotfiles
 
 collections:

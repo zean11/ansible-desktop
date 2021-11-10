@@ -22,7 +22,8 @@ sudo ${package_manager} ${package}
 
 echo "Ensuring ansible galaxy requirements"
 curl "https://gitlab.com/api/v4/projects/martin.goerz%2Fansible-desktop/repository/files/requirements.yml/raw?ref=main" > requirements.yml
-sudo ansible-galaxy install -r requirements.yml
+sudo ansible-galaxy role install -r requirements.yml
+sudo ansible-galaxy collection install -r requirements.yml
 rm requirements.yml
 
 echo "Runninng ansible-pull"
