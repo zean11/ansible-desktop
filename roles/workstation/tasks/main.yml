@@ -196,11 +196,11 @@
     mode: '0755'
     recurse: yes
   loop:
-    - '/home/{{host_username}}/'
-#    - '/home/{{host_username}}/.config'
-#    - '/home/{{host_username}}/.dotfiles'
-#    - '/home/{{host_username}}/.local/share/fonts'
-#    - '/home/{{host_username}}/.bashrc'
+    # - '/home/{{host_username}}/'
+    - '/home/{{host_username}}/.config'
+    - '/home/{{host_username}}/.dotfiles'
+    - '/home/{{host_username}}/.local/share/fonts'
+    - '/home/{{host_username}}/.bashrc'
   become: yes
 
 
@@ -219,6 +219,21 @@
       command:
         cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ remote set-url --push origin git@gitlab.com:martin.goerz/dotfiles.git'
 
+- name: Reset owner of directories
+  file:
+    path: '{{item}}'
+    owner: "{{host_username}}"
+    group: "{{host_username}}"
+    state: directory
+    mode: '0755'
+    recurse: yes
+  loop:
+    # - '/home/{{host_username}}/'
+    - '/home/{{host_username}}/.config'
+    - '/home/{{host_username}}/.dotfiles'
+    - '/home/{{host_username}}/.local/share/fonts'
+    - '/home/{{host_username}}/.bashrc'
+  become: yes
 
 # Global gitignore 
 - name: Global gitignore 
@@ -227,7 +242,6 @@
     value: '$HOME/.config/.gitignore_global'
     scope: global
 
-# Show Untracked Files no
 - name: Show Untracked Files no
   git_config:
     name: status.showUntrackedFiles
