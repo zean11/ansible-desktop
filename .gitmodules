@@ -1,3 +1,0 @@
-[submodule "dotfiles"]
-	path = dotfiles
-	url = https://gitlab.com/martin.goerz/dotfiles.git
