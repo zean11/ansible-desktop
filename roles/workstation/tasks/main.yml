@@ -200,9 +200,7 @@
     - '/home/{{host_username}}/.config'
     - '/home/{{host_username}}/.dotfiles'
     - '/home/{{host_username}}/.local/share/fonts'
-    - '/home/{{host_username}}/.bashrc'
   become: yes
-
 
 - name: Restore all files on first time setup
   when: not dotfiles_folder.stat.exists
@@ -233,6 +231,19 @@
     - '/home/{{host_username}}/.dotfiles'
     - '/home/{{host_username}}/.local/share/fonts'
     - '/home/{{host_username}}/.bashrc'
+  become: yes
+
+- name: Reset owner of files
+  file:
+    path: '{{item}}'
+    owner: "{{host_username}}"
+    group: "{{host_username}}"
+    state: file
+    mode: '0755'
+  loop:
+    - '/home/{{host_username}}/.bashrc'
+    - '/home/{{host_username}}/.zshrc'
+    - '/home/{{host_username}}/.inputrc'
   become: yes
 
 # Global gitignore 
