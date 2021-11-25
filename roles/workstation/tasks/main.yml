@@ -86,25 +86,17 @@
   become: yes
   tags: [ packages ]
 
-- name: Ensure flathub repo
-  shell: >
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-  become: yes
-
 - name: Ensure snap classic
   shell: >
     sudo ln -s /var/lib/snapd/snap /snap
   args:
     creates: "/snap"
 
-- name: Ensure snap packages
-  community.general.snap:
-    name:
-      - code
-    state: present
-    classic: yes
+- name: Ensure flathub repo
+  shell: >
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
   become: yes
-  tags: [ packages ]
+
 
 - name: Ensure nvm for Nodejs
   shell: >
@@ -142,6 +134,15 @@
   loop:
     - crond
   become: yes
+
+- name: Ensure snap packages
+  community.general.snap:
+    name:
+      - code
+    state: present
+    classic: yes
+  become: yes
+  tags: [ packages ]
 
 #
 # Configs
