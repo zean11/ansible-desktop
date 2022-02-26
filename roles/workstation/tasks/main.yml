@@ -4,19 +4,24 @@
     path: /home/{{host_username}}/.dotfiles
   register: dotfiles_folder
 
-- name: Ensure repositories
+- name: Register Desktop Environment
+  ansible.builtin.shell: "echo $XDG_CURRENT_DESKTOP"
+  register: desktop_environment
+  ignore_errors: true
+
+- name: Ensure fedora repositories
   dnf:
     name:
       - fedora-workstation-repositories
     state: present
   become: yes
-  tags: [ repos fedora ]
+  when: ansible_distribution == 'Fedora'
 
 # Make sure relevant system and desktop support packages are installed.
 - name: Ensure base system packages
   package:
     name:
-      - 'fd-find'
+      - "fd-find"
       - cmake
       - cronie
       - curl
@@ -37,7 +42,6 @@
       - zoxide
       - zsh
     state: present
-  tags: [ packages ]
   become: yes
 
 - name: Ensure Gnome packages
@@ -50,8 +54,8 @@
       - papirus-icon-theme
     state: latest
   become: yes
-  tags: [ gnome ] 
- 
+  when: desktop_environment is defined and desktop_environment == 'GNOME'
+
 - name: Ensure Gnome packages removed
   package:
     name:
@@ -59,32 +63,31 @@
       - vifm
     state: absent
   become: yes
-  tags: [ gnome ] 
+  when: desktop_environment is defined and desktop_environment == 'GNOME'
 
 - name: Ensure desktop packages
   package:
     name:
       - google-chrome-stable
     state: present
-    enablerepo: 
+    enablerepo:
       - google-chrome
   become: yes
-  tags: [ packages ]
+  when: desktop_environment is defined and desktop_environment == 'GNOME'
 
 - name: Ensure software development packages
   package:
     name:
-      - neovim
+      # - neovim
       - gcc-c++
       - ripgrep
       - fzf
-      - tmux
+      # - tmux
       - nodejs
       - python3
       - python3-pip
     state: present
   become: yes
-  tags: [ packages ]
 
 - name: Ensure snap classic
   shell: >
@@ -97,7 +100,6 @@
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
   become: yes
 
-
 - name: Ensure nvm for Nodejs
   shell: >
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
@@ -107,7 +109,7 @@
 # Install python extra packages and ensure they are up to date.
 - name: Ensure pip3 packages
   pip:
-    name: '{{item}}'
+    name: "{{item}}"
     executable: pip3
     state: latest
   loop:
@@ -116,19 +118,19 @@
 
 - name: Ensure Node global packages (npm)
   npm:
-    name: '{{item}}'
+    name: "{{item}}"
     global: yes
     state: latest
     production: yes
   loop:
-    - '@bitwarden/cli'
+    - "@bitwarden/cli"
   changed_when: false # ignore
   become: yes
 
 # Make sure system services we explicitly need are running and enabled.
 - name: Enable and start system services
   service:
-    name: '{{item}}'
+    name: "{{item}}"
     state: started
     enabled: yes
   loop:
@@ -142,22 +144,21 @@
     state: present
     classic: yes
   become: yes
-  tags: [ packages ]
 
 #
 # Configs
 #
 - name: Ensure default directories in home
   file:
-    path: '{{item}}'
+    path: "{{item}}"
     state: directory
-    mode: '0774'
-    owner: '{{host_username}}'
-    group: '{{host_username}}'
+    mode: "0774"
+    owner: "{{host_username}}"
+    group: "{{host_username}}"
   loop:
-      - '/home/{{host_username}}/.ssh'
-      - '/home/{{host_username}}/.dotfiles'
-      - '/home/{{host_username}}/dev'
+    - "/home/{{host_username}}/.ssh"
+    - "/home/{{host_username}}/.dotfiles"
+    - "/home/{{host_username}}/dev"
   become: yes
 
 # Set up ansible-pull
@@ -179,28 +180,28 @@
 - name: Add ansible-pull cron job
   become: true
   cron:
-   name: ansible auto-provision
-   user: root
-   minute: "*/10"
-   job: "/usr/bin/ansible-pull -o --track-subs -U https://gitlab.com/martin.goerz/ansible-desktop.git > /var/log/ansible_bot.log"
+    name: ansible auto-provision
+    user: root
+    minute: "*/10"
+    job: "/usr/bin/ansible-pull -o --track-subs -U https://gitlab.com/martin.goerz/ansible-desktop.git > /var/log/ansible_bot.log"
 
 # Dotfiles
 - include_role:
     name: jan_matthis.git_dotfiles
-  
+
 - name: Reset owner of directories
   file:
-    path: '{{item}}'
+    path: "{{item}}"
     owner: "{{host_username}}"
     group: "{{host_username}}"
     state: directory
-    mode: '0755'
+    mode: "0755"
     recurse: yes
   loop:
     # - '/home/{{host_username}}/'
-    - '/home/{{host_username}}/.config'
-    - '/home/{{host_username}}/.dotfiles'
-    - '/home/{{host_username}}/.local/share/fonts'
+    - "/home/{{host_username}}/.config"
+    - "/home/{{host_username}}/.dotfiles"
+    - "/home/{{host_username}}/.local/share/fonts"
   become: yes
 
 - name: Restore all files on first time setup
@@ -208,67 +209,67 @@
   block:
     - name: Unstage all missing files in dotfile repository
       command:
-        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ reset'
+        cmd: "git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ reset"
 
     - name: Restore missing files from dotifle repository
       command:
-        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore /home/{{host_username}}/'
+        cmd: "git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ restore /home/{{host_username}}/"
 
-    - name: change upstream 
+    - name: change upstream
       command:
-        cmd: 'git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ remote set-url --push origin git@gitlab.com:martin.goerz/dotfiles.git'
+        cmd: "git --git-dir=/home/{{host_username}}/.dotfiles/ --work-tree=/home/{{host_username}}/ remote set-url --push origin git@gitlab.com:martin.goerz/dotfiles.git"
 
 - name: Ensure owner permissions agian after git reset
   file:
-    path: '{{item}}'
+    path: "{{item}}"
     owner: "{{host_username}}"
     group: "{{host_username}}"
     state: directory
-    mode: '0755'
+    mode: "0755"
     recurse: yes
   loop:
-    - '/home/{{host_username}}/.config'
-    - '/home/{{host_username}}/.dotfiles'
-    - '/home/{{host_username}}/.local/share/fonts'
+    - "/home/{{host_username}}/.config"
+    - "/home/{{host_username}}/.dotfiles"
+    - "/home/{{host_username}}/.local/share/fonts"
   become: yes
 
 - name: Reset owner of files
   file:
-    path: '{{item}}'
+    path: "{{item}}"
     owner: "{{host_username}}"
     group: "{{host_username}}"
     state: file
-    mode: '0755'
+    mode: "0755"
   loop:
-    - '/home/{{host_username}}/.bashrc'
-    - '/home/{{host_username}}/.zshrc'
-    - '/home/{{host_username}}/.inputrc'
+    - "/home/{{host_username}}/.bashrc"
+    - "/home/{{host_username}}/.zshrc"
+    - "/home/{{host_username}}/.inputrc"
   become: yes
 
-# Global gitignore 
-- name: Global gitignore 
+# Global gitignore
+- name: Global gitignore
   git_config:
     name: core.excludesfile
-    value: '$HOME/.config/.gitignore_global'
+    value: "$HOME/.config/.gitignore_global"
     scope: global
 
 - name: Show Untracked Files no
   git_config:
     name: status.showUntrackedFiles
-    repo: '/home/{{host_username}}/.dotfiles'
+    repo: "/home/{{host_username}}/.dotfiles"
     value: "no"
     scope: local
 
 - name: Remove bash clutter
   file:
-    path: '{{item}}'
-    owner: '{{host_username}}'
-    group: '{{host_username}}'
+    path: "{{item}}"
+    owner: "{{host_username}}"
+    group: "{{host_username}}"
     state: absent
   loop:
-    - '/home/{{host_username}}/.bash_profile'
-    - '/home/{{host_username}}/.bash_history'
-    - '/home/{{host_username}}/.bash_logout'
+    - "/home/{{host_username}}/.bash_profile"
+    - "/home/{{host_username}}/.bash_history"
+    - "/home/{{host_username}}/.bash_logout"
   become: yes
 
 #
@@ -303,7 +304,7 @@
 #    src: "{{ item.path }}"
 #    path: "/home/{{host_username}}/.config/nvim/lua/custom/{{ item.path | basename }}"
 #    state: link
-#  with_items: 
+#  with_items:
 #    - chadrc.lua
 #    - init.lua
 #  when: not nvchad.stat.exists
@@ -314,7 +315,7 @@
   file:
     path: /etc/dconf/profile
     state: directory
-    mode: '0755'
+    mode: "0755"
     owner: root
     group: root
   become: yes
@@ -329,7 +330,7 @@
   copy:
     src: dconf_profile_user
     dest: /etc/dconf/profile/user
-    mode: '0644'
+    mode: "0644"
     owner: root
     group: root
   become: yes
@@ -338,7 +339,7 @@
   file:
     path: /etc/dconf/db/local.d
     state: directory
-    mode: '0755'
+    mode: "0755"
     owner: root
     group: root
   become: yes
@@ -347,10 +348,10 @@
   copy:
     src: /home/{{host_username}}/.config/dconf_back
     dest: /etc/dconf/db/local.d/00-global
-    mode: '0644'
+    mode: "0644"
     owner: root
     group: root
-  notify: [ Update dconf ]
+  notify: [Update dconf]
   become: yes
 # END
 
@@ -368,7 +369,7 @@
 #     creates: '/root/.oh-my-zsh'
 #   changed_when: false # ignore
 #   become: yes
-# 
+#
 # - name: Install oh-my-zsh for self
 #   script:
 #     cmd: 'scripts/oh-my-zsh-setup.sh --unattended --keep-zshrc'
@@ -398,8 +399,15 @@
 #     - { src: motd, dest: /etc/motd } # User motd
 #   become: yes
 # - name: Create a 2048-bit SSH key for user jsmith in ~jsmith/.ssh/id_rsa
-  # ansible.builtin.user:
-  #   name: jsmith
-  #   generate_ssh_key: yes
-  #   ssh_key_bits: 2048
-  #   ssh_key_file: .ssh/id_rsa
+# ansible.builtin.user:
+#   name: jsmith
+#   generate_ssh_key: yes
+#   ssh_key_bits: 2048
+#   ssh_key_file: .ssh/id_rsa
+
+- name: Ensure that package is removed
+  package:
+    name:
+      - vifm
+    state: absent
+  become: yes
